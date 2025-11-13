@@ -1,143 +1,140 @@
-# Clinic Appointment - Project Layout
+🏥 Clinic Appointment Management App
 
-This repository uses a Flask backend and a React + TypeScript frontend. The README below describes the recommended project structure, conventions and common commands to develop, test and deploy.
+A full-stack web application for managing patients, doctors, and appointments in a clinic.
+Built with React (Vite) on the frontend and Flask on the backend.
 
-## Top-level layout
-- backend/        - Flask application (Python)
-- frontend/       - React + TypeScript (Vite)
-- infra/          - Docker, Kubernetes, or cloud infra manifests
-- docs/           - Architecture docs, API contracts, ER diagrams
-- scripts/        - Helper scripts (seed, migrations helpers, CI helpers)
-- tests/          - Integration / e2e tests (if not colocated)
-- .env.example    - Example environment variables
-- docker-compose.yml
+📁 Project Structure
+```
+clinic-appointment-management-api/
+├── server/                     # Flask backend
+│   ├── app.py
+│   ├── models.py
+│   ├── routes/
+│   ├── config.py
+│   └── ...
+└── clinic-appointment/         # React frontend (Vite)
+    ├── src/
+    │   ├── pages/
+    │   │   ├── Home.jsx
+    │   │   ├── Patients.jsx
+    │   │   ├── Appointments.jsx
+    │   │   └── Doctors.jsx
+    │   ├── App.jsx
+    │   ├── main.jsx
+    │   └── index.css
+    ├── vite.config.js
+    ├── package.json
+    └── ...
+```
 
----
+⚙️ Tech Stack
+Layer	Technology
+Frontend	React (Vite), React Router
+Backend	Flask (Python)
+Database	SQLite (via SQLAlchemy ORM)
+API Communication	RESTful JSON
+Dev Tools	npm, pipenv, Vite dev server, Flask CLI
+🚀 Setup Instructions
+1️⃣ Clone the repository
+git clone https://github.com/yourusername/clinic-appointment-management-api.git
+cd clinic-appointment-management-api
 
-## Backend (backend/)
-Suggested structure (factory pattern, modular blueprints):
-- backend/
-  - app/
-    - __init__.py         # create_app factory, blueprint registration
-    - config.py           # env-specific config classes
-    - extensions.py       # db, migrate, jwt, cors, ma, etc.
-    - models/             # SQLAlchemy models
-    - schemas/            # Marshmallow / Pydantic schemas
-    - api/
-      - v1/
-        - auth/
-        - appointments/
-        - users/
-    - services/           # business logic, use-case layer
-    - repositories/       # db access abstraction
-    - utils/              # helpers, validators
-    - cli.py              # custom flask CLI commands
-    - tests/              # backend unit tests
-  - migrations/           # Alembic / Flask-Migrate files
-  - requirements.txt
-  - Dockerfile
-  - wsgi.py / run.py
+2️⃣ Backend Setup (Flask)
 
-Best practices:
-- Use application factory and configuration objects.
-- Keep request parsing in schemas and business logic in services.
-- Use Flask-Migrate for DB schema changes.
-- Centralize extensions in extensions.py to avoid circular imports.
+Navigate to the server folder:
+```
+cd server
+```
 
-Common commands:
-- python -m venv .venv && source .venv/bin/activate
-- pip install -r backend/requirements.txt
-- export FLASK_APP=backend.app:create_app
-- flask db upgrade
-- flask run
+Create a virtual environment and activate it:
+```
+pipenv install && pipenv shell
+```
 
----
+Install dependencies:
+```
+pip install -r requirements.txt
+```
 
-## Frontend (frontend/)
-Typical Vite + React + TypeScript layout:
-- frontend/
-  - package.json
-  - tsconfig.json
-  - vite.config.ts
-  - public/               # static assets, index.html
-  - src/
-    - main.tsx            # app bootstrap
-    - App.tsx
-    - api/                # api client (axios / fetch wrappers)
-    - services/           # calls coordinating multiple api endpoints
-    - hooks/              # reusable hooks (useAuth, useFetch)
-    - features/           # domain folders (appointments, users)
-      - appointments/
-        - components/
-        - pages/
-        - types.ts
-        - hooks.ts
-    - components/         # shared UI components
-    - pages/              # top-level pages / routes
-    - routes/             # react-router setup
-    - contexts/           # React contexts
-    - store/              # global state (RTK / Zustand / Context)
-    - types/              # shared TypeScript types
-    - styles/             # global styles, theme
-    - tests/              # frontend tests (Jest / Testing Library)
-  - Dockerfile
+Run the backend server:
+```
+flask run --port 5555
+```
 
-Best practices:
-- Keep domain logic in feature folders.
-- Type API responses and form data.
-- Provide an API client that centralizes base URL, auth headers, and error handling.
-- Use env files (.env.development/.env.production) for API base URLs and feature flags.
+✅ The backend will now run at http://localhost:5555
 
-Common commands:
-- cd frontend
-- npm install
-- npm run dev
-- npm run build
-- npm run test
-- npm run lint / npm run format
+3️⃣ Frontend Setup (React + Vite)
 
----
+Navigate to the React app:
+```
+cd ../clinic-appointment
+```
 
-## Development workflow
-- Run backend and frontend concurrently (use docker-compose or tools like concurrently)
-- Configure CORS on the backend and a proxy in frontend dev if needed
-- Use .env.example for required environment variables and do not commit secrets
-- Run linters and formatters pre-commit (Black, isort, flake8 for Python; Prettier, ESLint, TypeScript for frontend)
-- Write unit tests for services and components; write integration tests for endpoints and flows
+Install dependencies:
+```
+npm install
+```
 
-Example dev run (local):
-- backend: FLASK_ENV=development FLASK_APP=backend.app:create_app flask run
-- frontend: cd frontend && npm run dev
+Run the development server:
+```
+npm run dev
+```
 
----
+✅ The frontend will now run at http://localhost:5173
 
-## Deployment
-Options:
-- Build frontend into static files and serve via Nginx (or CDN), backend as Gunicorn + workers behind a reverse proxy.
-- Use Docker images and deploy with docker-compose, ECS, GKE, or other providers.
-- Secure secrets with a secret manager; use environment-specific config classes.
+🔗 Connecting Frontend to Backend
 
-Production tips:
-- Enable strict CORS and auth.
-- Use HTTPS and set secure cookies.
-- Run database migrations during deploy pipeline.
+The vite.config.js file is already configured to proxy API calls from React to Flask:
+```
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5555',
+    },
+  },
+  plugins: [react()],
+})
+```
 
----
+That means:
 
-## Testing & CI
-- Backend: pytest, fixtures, factory boy for test objects; run migrations in CI test job.
-- Frontend: Jest + React Testing Library; include basic accessibility checks.
-- CI pipeline should run: lint -> test -> build -> (optionally) deploy
-- Include test coverage thresholds and fail on regressions.
+When React fetches /api/patients, it’s automatically redirected to Flask at http://localhost:5555/api/patients.
 
----
+📄 Available Pages
+Page	Route	Description
+🏠 Home	/	Welcome screen
+👩‍⚕️ Doctors	/doctors	View list of doctors
+👨‍👩‍👧 Patients	/patients	Manage patient records
+📅 Appointments	/appointments	Schedule and view appointments
+🧠 Example API Endpoints (Flask)
+Method	Endpoint	Description
+GET	/api/doctors	Get all doctors
+POST	/api/doctors	Create a new doctor
+GET	/api/patients	Get all patients
+POST	/api/patients	Add a patient
+GET	/api/appointments	Get all appointments
+POST	/api/appointments	Create a new appointment
+🧑‍💻 Development Notes
 
-## Conventions & Notes
-- Use feature/ or hotfix/ branches and follow PR reviews.
-- Keep controllers thin; put logic in services.
-- Centralize error handling and API response formats.
-- Maintain an up-to-date README in both backend/ and frontend/ with their own developer setup steps.
+Use React Router for navigation.
 
----
+Use the Fetch API or Axios for data fetching.
 
-For quick onboarding, add docs/DEVELOPER.md with step-by-step setup for new contributors (virtualenv setup, node version, env variables, running both apps).
+Keep your Flask server running while testing API requests.
+
+You can modify the proxy port in vite.config.js if Flask runs on a different port.
+
+🧾 License
+
+This project is licensed under the MIT License — feel free to use and modify it for educational or professional purposes.
+
+👩‍💼 Authors:
+
+Ann Ngatia
+Abdirahman Hussein
+Ann Gathoni
+David Githehu
+Nassur Mohammed
+
+Full Stack Developers (React + Flask),
+Moringa School.
