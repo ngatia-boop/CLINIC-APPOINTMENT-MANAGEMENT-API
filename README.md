@@ -37,7 +37,9 @@ Dev Tools	npm, pipenv, Vite dev server, Flask CLI
 🚀 Setup Instructions
 1️⃣ Clone the repository
 git clone https://github.com/yourusername/clinic-appointment-management-api.git
+```
 cd clinic-appointment-management-api
+```
 
 2️⃣ Backend Setup (Flask)
 
