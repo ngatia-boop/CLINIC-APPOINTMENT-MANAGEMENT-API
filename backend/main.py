@@ -1,4 +1,6 @@
-print ("Hello, World!")
+from backend import create_app
+
+app = create_app()
 
 if __name__ == "__main__":
-    print ("This is the main module.")
+    app.run(debug=True)
