@@ -17,8 +17,6 @@
 body {
   margin: 0;
   padding: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
   font-family: system-ui, Arial, sans-serif;
@@ -66,7 +64,7 @@ button:focus-visible {
 
 /* Navigation Bar Styles */
 nav {
-  background-color: #0077cc;
+  background-color: #4400cc;
   padding: 1rem;
   width: 100%;
   display: flex;
