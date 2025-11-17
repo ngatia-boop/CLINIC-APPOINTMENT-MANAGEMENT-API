@@ -1,44 +1,45 @@
-from flask import Blueprint, request, jsonify
-from backend import db
-from backend.models.patient import Patient
+from flask import request, jsonify
+from backend.models import Patient
+from backend.extensions import db
+from backend.routes import patients_bp
 
-patient_bp = Blueprint('patient_bp', __name__)
-
-def error_response(message, status=400):
-    return jsonify({'error': message}), status
-
-# GET /patients/ → list all patients
-@patient_bp.route('/', methods=['GET'])
+@patients_bp.get("/")
 def get_patients():
     patients = Patient.query.all()
     return jsonify([p.to_dict() for p in patients]), 200
 
-# POST /patients/ → create a new patient
-@patient_bp.route('/', methods=['POST'])
+@patients_bp.get("/<int:id>")
+def get_patient(id):
+    patient = Patient.query.get_or_404(id)
+    return jsonify(patient.to_dict(include_appointments=True)), 200
+
+@patients_bp.post("/")
 def create_patient():
-    data = request.get_json() or {}
-    name = data.get('name')
-    email = data.get('email')
-    phone = data.get('phone')
+    data = request.json
+    patient = Patient(
+        name=data["name"],
+        age=data["age"],
+        gender=data["gender"],
+        phone=data["phone"]
+    )
+    db.session.add(patient)
+    db.session.commit()
+    return jsonify(patient.to_dict()), 201
 
-    if not name or not email:
-        return error_response('name and email are required')
+@patients_bp.put("/<int:id>")
+def update_patient(id):
+    data = request.json
+    patient = Patient.query.get_or_404(id)
+    patient.name = data.get("name", patient.name)
+    patient.age = data.get("age", patient.age)
+    patient.gender = data.get("gender", patient.gender)
+    patient.phone = data.get("phone", patient.phone)
+    db.session.commit()
+    return jsonify(patient.to_dict()), 200
 
-    # check for email uniqueness
-    if Patient.query.filter_by(email=email).first():
-        return error_response('email already exists')
-
-    try:
-        p = Patient(name=name, email=email, phone=phone)
-        db.session.add(p)
-        db.session.commit()
-        return jsonify(p.to_dict()), 201
-    except Exception as e:
-        db.session.rollback()
-        return error_response(str(e), 500)
-
-# GET /patients/<id> → get a single patient
-@patient_bp.route('/<int:patient_id>', methods=['GET'])
-def get_patient(patient_id):
-    p = Patient.query.get_or_404(patient_id)
-    return jsonify(p.to_dict()), 200
+@patients_bp.delete("/<int:id>")
+def delete_patient(id):
+    patient = Patient.query.get_or_404(id)
+    db.session.delete(patient)
+    db.session.commit()
+    return jsonify({"message": "Patient deleted"}), 200

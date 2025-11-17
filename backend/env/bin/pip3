@@ -1,4 +1,4 @@
-#!/home/ngatia/clinic-appointment-management-api/backend/env/bin/python
+#!/home/njagua/CLINIC-APPOINTMENT-MANAGEMENT-API/backend/env/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
