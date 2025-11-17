@@ -1,19 +1,35 @@
-from clinic_backend.config import db
+from datetime import datetime
+from backend.extensions import db
 
 class Appointment(db.Model):
     __tablename__ = 'appointments'
 
-    id = db.Column(db.Integer, primary_key=True)  # primary key is mandatory
-    date = db.Column(db.DateTime, nullable=False)
-    description = db.Column(db.String(255), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    notes = db.Column(db.String(255), nullable=False)
 
-    # Foreign key linking to Patient
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=True)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'date': self.date.isoformat(),
-            'description': self.description,
-            'patient_id': self.patient_id
+    # Relationships
+    patient = db.relationship('Patient', back_populates='appointments')
+    doctor = db.relationship('Doctor', back_populates='appointments')
+
+    def to_dict(self, include_patient=False, include_doctor=False):
+        data = {
+            "id": self.id,
+            "date": self.date.strftime("%Y-%m-%d"),
+            "time": self.time.strftime("%H:%M"),
+            "notes": self.notes,
+            "patient_id": self.patient_id,
+            "doctor_id": self.doctor_id,
         }
+
+        if include_patient and self.patient:
+            data["patient"] = self.patient.to_dict()
+
+        if include_doctor and self.doctor:
+            data["doctor"] = self.doctor.to_dict()
+
+        return data
