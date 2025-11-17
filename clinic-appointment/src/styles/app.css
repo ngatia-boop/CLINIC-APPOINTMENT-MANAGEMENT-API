@@ -59,3 +59,25 @@ button {
   border-radius: 8px;
 }
 
+.doctor-card {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.doctor-card h3 {
+  margin: 0 0 10px;
+}
+
+.available {
+  color: green;
+  font-weight: bold;
+}
+
+.unavailable {
+  color: red;
+  font-weight: bold;
+}
