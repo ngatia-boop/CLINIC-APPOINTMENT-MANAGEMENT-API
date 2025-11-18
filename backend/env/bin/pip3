@@ -1,4 +1,6 @@
-#!/home/ngatia/clinic-appointment-management-api/backend/env/bin/python
+#!/bin/sh
+'''exec' "/mnt/c/Users/Davie Githehu/Desktop/moringawork/phase_4/CLINIC-APPOINTMENT-MANAGEMENT-API/backend/env/bin/python" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

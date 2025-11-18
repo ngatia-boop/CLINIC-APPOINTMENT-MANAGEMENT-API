@@ -7,7 +7,7 @@ Flask-Cors==5.0.0
 
 # Serialization & Validation
 marshmallow==3.21.3
-marshmallow-sqlalchemy==1.6.3
+marshmallow-sqlalchemy==1.4.2
 
 # Environment Management
 python-dotenv==1.0.1
