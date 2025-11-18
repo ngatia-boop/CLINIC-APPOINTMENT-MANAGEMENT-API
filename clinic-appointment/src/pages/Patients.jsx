@@ -1,27 +1,38 @@
 // src/pages/Patients.jsx
 import { useEffect, useState } from "react";
-import PatientsForm from "../components/PatientsForm.jsx";
-import { fetchJSON } from "../api/client";
+import PatientsForm from "../components/PatientsForm.jsx"; 
+import { fetchJSON } from "../api/client.jsx";
 
 export default function PatientsPage() {
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
     fetchJSON("/patients")
-      .then(data => setPatients(data))
-      .catch(err => console.error("Failed to fetch patients", err));
+      .then((data) => setPatients(data))
+      .catch((err) => console.error("Failed to fetch patients", err));
   }, []);
 
-  const handleNewPatient = (patient) => setPatients(prev => [...prev, patient]);
+  const handleNewPatient = (patient) => setPatients((prev) => [...prev, patient]);
+
+  const handleDeleted = async (id) => {
+    await fetchJSON(`/patients/${id}`, { method: "DELETE" });
+    setPatients((prev) => prev.filter((p) => p.id !== id));
+  };
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Patients</h1>
       <PatientsForm onCreated={handleNewPatient} />
-      <ul className="mt-4">
-        {patients.map(p => (
-          <li key={p.id} className="border p-2 rounded mb-2">
-            {p.name}, Age: {p.age}, Gender: {p.gender}, Phone: {p.phone}
+      <ul className="mt-4 space-y-2">
+        {patients.map((p) => (
+          <li key={p.id} className="border p-2 rounded flex justify-between items-center">
+            <span>{p.name}, Age: {p.age}, Gender: {p.gender}, Phone: {p.phone}</span>
+            <button
+              className="bg-red-500 text-white px-2 py-1 rounded"
+              onClick={() => handleDeleted(p.id)}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>

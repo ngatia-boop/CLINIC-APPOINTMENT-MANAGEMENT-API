@@ -1,68 +1,47 @@
+// src/components/PatientsForm.jsx
 import { useState } from "react";
-import { fetchJSON } from "../api/client";
+import { fetchJSON } from "../api/client.jsx";
 
 export default function PatientsForm({ onCreated }) {
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     name: "",
     age: "",
     gender: "",
     phone: "",
   });
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const newPatient = await fetchJSON("/patients", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-
-    if (onCreated) onCreated(newPatient);
-
-    setForm({ name: "", age: "", gender: "", phone: "" });
-  }
+    try {
+      const newPatient = await fetchJSON("/patients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      onCreated(newPatient); // update parent list
+      setFormData({ name: "", age: "", gender: "", phone: "" });
+    } catch (err) {
+      console.error("Failed to create patient:", err);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 grid gap-3 bg-white rounded-xl shadow">
-      <input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        placeholder="Name"
-        className="p-2 rounded border"
-      />
-      <input
-        name="age"
-        value={form.age}
-        onChange={handleChange}
-        placeholder="Age"
-        className="p-2 rounded border"
-      />
-      <input
-        name="gender"
-        value={form.gender}
-        onChange={handleChange}
-        placeholder="Gender"
-        className="p-2 rounded border"
-      />
-      <input
-        name="phone"
-        value={form.phone}
-        onChange={handleChange}
-        placeholder="Phone"
-        className="p-2 rounded border"
-      />
-      <button className="p-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition">
-        Add Patient
-      </button>
+    <form onSubmit={handleSubmit} className="border p-4 rounded space-y-2">
+      <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
+      <input name="age" type="number" value={formData.age} onChange={handleChange} placeholder="Age" required />
+      <select name="gender" value={formData.gender} onChange={handleChange} required>
+        <option value="">Select Gender</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+      </select>
+      <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" required />
+
+      <button type="submit" className="bg-green-500 text-white px-2 py-1 rounded">Add Patient</button>
     </form>
   );
 }
-

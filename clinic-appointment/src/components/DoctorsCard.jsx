@@ -1,23 +1,56 @@
-export default function DoctorsCard({ doctor, onDelete, onUpdate }) {
+// src/components/DoctorsCard.jsx
+import { useState } from "react";
+import { fetchJSON } from "../api/client.jsx";
+
+export default function DoctorsCard({ doctor, onUpdated, onDeleted }) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(doctor.name);
+  const [specialization, setSpecialization] = useState(doctor.specialization);
+  const [phone, setPhone] = useState(doctor.phone);
+
+  const handleUpdate = async () => {
+    try {
+      const updatedDoctor = await fetchJSON(`/doctors/${doctor.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, specialization, phone }),
+      });
+      onUpdated(updatedDoctor);
+      setEditing(false);
+    } catch (err) {
+      console.error("Failed to update doctor:", err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Delete this doctor?")) return;
+    try {
+      await fetchJSON(`/doctors/${doctor.id}`, { method: "DELETE" });
+      onDeleted(doctor.id);
+    } catch (err) {
+      console.error("Failed to delete doctor:", err);
+    }
+  };
+
   return (
-    <div className="p-4 bg-white rounded-xl shadow flex flex-col gap-2">
-      <h2 className="text-lg font-bold">{doctor.name}</h2>
-      <p>Specialization: {doctor.specialization}</p>
-      <p>Phone: {doctor.phone}</p>
-      <div className="flex gap-2 mt-2">
-        <button
-          onClick={() => onUpdate && onUpdate(doctor)}
-          className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete && onDelete(doctor.id)}
-          className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-        >
-          Delete
-        </button>
-      </div>
+    <div className="border p-4 rounded space-y-2">
+      {editing ? (
+        <>
+          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <button onClick={handleUpdate} className="bg-blue-500 text-white px-2 py-1 rounded">Save</button>
+          <button onClick={() => setEditing(false)} className="bg-gray-300 px-2 py-1 rounded">Cancel</button>
+        </>
+      ) : (
+        <>
+          <h3 className="font-bold">{doctor.name}</h3>
+          <p>{doctor.specialization}</p>
+          <p>{doctor.phone}</p>
+          <button onClick={() => setEditing(true)} className="bg-yellow-500 px-2 py-1 rounded">Edit</button>
+          <button onClick={handleDelete} className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+        </>
+      )}
     </div>
   );
 }
