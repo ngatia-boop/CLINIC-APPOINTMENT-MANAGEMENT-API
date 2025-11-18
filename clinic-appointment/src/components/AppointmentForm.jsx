@@ -1,88 +1,81 @@
-// src/components/AppointmentForm.jsx
 import { useState } from "react";
+import { fetchJSON } from "../api/client";
 
-function AppointmentForm({ onSubmit, initialData = {} }) {
-  const [formData, setFormData] = useState({
-    patientName: initialData.patientName || "",
-    doctorName: initialData.doctorName || "",
-    date: initialData.date || "",
-    time: initialData.time || "",
-    reason: initialData.reason || "",
+export default function AppointmentForm({ onCreated }) {
+  const [form, setForm] = useState({
+    patient_id: "",
+    doctor_id: "",
+    date: "",
+    time: "",
+    notes: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
 
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (onSubmit) onSubmit(formData);
-  };
+
+    const newAppointment = await fetchJSON("/appointments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    if (onCreated) onCreated(newAppointment);
+
+    setForm({ patient_id: "", doctor_id: "", date: "", time: "", notes: "" });
+  }
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
-      <h3>Schedule Appointment</h3>
-
-      <label>Patient Name:</label>
+    <form onSubmit={handleSubmit} className="p-4 grid gap-3 bg-white rounded-xl shadow">
       <input
-        type="text"
-        name="patientName"
-        value={formData.patientName}
+        name="patient_id"
+        value={form.patient_id}
         onChange={handleChange}
-        required
+        placeholder="Patient ID"
+        className="p-2 rounded border"
       />
 
-      <label>Doctor Name:</label>
       <input
-        type="text"
-        name="doctorName"
-        value={formData.doctorName}
+        name="doctor_id"
+        value={form.doctor_id}
         onChange={handleChange}
-        required
+        placeholder="Doctor ID"
+        className="p-2 rounded border"
       />
 
-      <label>Date:</label>
       <input
         type="date"
         name="date"
-        value={formData.date}
+        value={form.date}
         onChange={handleChange}
-        required
+        className="p-2 rounded border"
       />
 
-      <label>Time:</label>
       <input
         type="time"
         name="time"
-        value={formData.time}
+        value={form.time}
         onChange={handleChange}
-        required
+        className="p-2 rounded border"
       />
 
-      <label>Reason:</label>
       <textarea
-        name="reason"
-        value={formData.reason}
+        name="notes"
+        value={form.notes}
         onChange={handleChange}
-        rows="3"
+        placeholder="Notes"
+        className="p-2 rounded border"
       />
 
-      <button type="submit">Save Appointment</button>
+      <button className="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
+        Create Appointment
+      </button>
     </form>
   );
 }
 
-const styles = {
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    maxWidth: "400px",
-    gap: "10px",
-    padding: "15px",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-  },
-};
-
-export default AppointmentForm;

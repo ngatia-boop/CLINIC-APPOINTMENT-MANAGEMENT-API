@@ -1,32 +1,14 @@
-// src/components/NavBar.jsx
 import { Link } from "react-router-dom";
 
-function NavBar() {
+export default function Navbar() {
   return (
-    <nav style={styles.nav}>
-      <h2 style={styles.title}>Clinic Appointment System</h2>
-      <div style={styles.links}>
-        <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/patients" style={styles.link}>Patients</Link>
-        <Link to="/appointments" style={styles.link}>Appointments</Link>
-        <Link to="/doctors" style={styles.link}>Doctors</Link>
+    <nav className="flex justify-between items-center p-4 bg-blue-700 text-white shadow">
+      <h1 className="text-xl font-bold">Clinic App</h1>
+      <div className="flex gap-4">
+        <Link to="/" className="hover:underline">Appointments</Link>
+        <Link to="/patients" className="hover:underline">Patients</Link>
+        <Link to="/doctors" className="hover:underline">Doctors</Link>
       </div>
     </nav>
   );
 }
-
-const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#007bff",
-    padding: "10px 20px",
-    color: "#fff",
-  },
-  title: { margin: 0 },
-  links: { display: "flex", gap: "15px" },
-  link: { color: "white", textDecoration: "none", fontWeight: "bold" },
-};
-
-export default NavBar;

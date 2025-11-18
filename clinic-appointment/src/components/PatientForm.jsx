@@ -1,82 +1,68 @@
-// src/components/PatientForm.jsx
 import { useState } from "react";
+import { fetchJSON } from "../api/client";
 
-function PatientForm({ onSubmit, initialData = {} }) {
-  const [formData, setFormData] = useState({
-    name: initialData.name || "",
-    age: initialData.age || "",
-    gender: initialData.gender || "",
-    contact: initialData.contact || "",
+export default function PatientsForm({ onCreated }) {
+  const [form, setForm] = useState({
+    name: "",
+    age: "",
+    gender: "",
+    phone: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
 
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (onSubmit) onSubmit(formData);
-  };
+
+    const newPatient = await fetchJSON("/patients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    if (onCreated) onCreated(newPatient);
+
+    setForm({ name: "", age: "", gender: "", phone: "" });
+  }
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
-      <h3>Add / Edit Patient</h3>
-
-      <label>Name:</label>
+    <form onSubmit={handleSubmit} className="p-4 grid gap-3 bg-white rounded-xl shadow">
       <input
-        type="text"
         name="name"
-        value={formData.name}
+        value={form.name}
         onChange={handleChange}
-        required
+        placeholder="Name"
+        className="p-2 rounded border"
       />
-
-      <label>Age:</label>
       <input
-        type="number"
         name="age"
-        value={formData.age}
+        value={form.age}
         onChange={handleChange}
-        required
+        placeholder="Age"
+        className="p-2 rounded border"
       />
-
-      <label>Gender:</label>
-      <select
-        name="gender"
-        value={formData.gender}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Select gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-
-      <label>Contact:</label>
       <input
-        type="text"
-        name="contact"
-        value={formData.contact}
+        name="gender"
+        value={form.gender}
         onChange={handleChange}
-        required
+        placeholder="Gender"
+        className="p-2 rounded border"
       />
-
-      <button type="submit">Save Patient</button>
+      <input
+        name="phone"
+        value={form.phone}
+        onChange={handleChange}
+        placeholder="Phone"
+        className="p-2 rounded border"
+      />
+      <button className="p-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition">
+        Add Patient
+      </button>
     </form>
   );
 }
 
-const styles = {
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    maxWidth: "400px",
-    gap: "10px",
-    padding: "15px",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-  },
-};
-
-export default PatientForm;
