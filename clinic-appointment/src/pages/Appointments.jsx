@@ -5,7 +5,7 @@ function Appointments() {
 
   useEffect(() => {
     // Fetch data from backend API
-    fetch("http://localhost:5000/appointments/"
+    fetch("http://127.0.0.1:5555/appointments/"
 )
       .then((r) => r.json())
       .then(setAppointments)

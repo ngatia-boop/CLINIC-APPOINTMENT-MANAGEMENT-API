@@ -4,7 +4,7 @@ function Patients() {
   const [patients, setPatients] = useState([])
 
   useEffect(() => {
-    fetch("http://localhost:5000/patients/")
+    fetch("http://127.0.0.1:5555/patients/")
       .then((r) => r.json())
       .then(setPatients)
   }, [])
