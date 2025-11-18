@@ -1,10 +1,11 @@
-function Home() {
-  return (
-    <div className="home-page">
-      <h1>Welcome to Clinic Appointment Manager</h1>
-      <p>Book and manage your appointments with ease.</p>
-    </div>
-  )
-}
+// src/pages/Home.jsx
+import React from 'react';
 
-export default Home
+export default function HomePage() {
+  return (
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-4">Welcome to the Clinic Appointment App</h1>
+      <p className="text-lg">Use the navigation bar to view appointments, patients, and doctors.</p>
+    </div>
+  );
+}

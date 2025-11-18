@@ -1,32 +1,41 @@
-import { useEffect, useState } from 'react'
-import DoctorCard from '../components/DoctorCard'
+// src/pages/Doctors.jsx
+import { useEffect, useState } from "react";
+import DoctorsCard from "../components/DoctorsCard.jsx";
+import { fetchJSON } from "../api/client";
 
-function Doctors() {
-  const [doctors, setDoctors] = useState([])
+export default function DoctorsPage() {
+  const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5555/doctors/')
-      .then((res) => res.json())
-      .then(setDoctors)
-      .catch((err) => console.error('Error fetching doctors:', err))
-  }, [])
+    fetchJSON("/doctors")
+      .then(data => setDoctors(data))
+      .catch(err => console.error("Failed to fetch doctors", err));
+  }, []);
+
+  const handleDelete = async (id) => {
+    await fetchJSON(`/doctors/${id}`, { method: "DELETE" });
+    setDoctors(prev => prev.filter(d => d.id !== id));
+  };
+
+  const handleUpdate = async (doctor) => {
+    const updatedName = prompt("Enter new name", doctor.name);
+    if (!updatedName) return;
+
+    const updated = await fetchJSON(`/doctors/${doctor.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...doctor, name: updatedName }),
+    });
+
+    setDoctors(prev => prev.map(d => d.id === updated.id ? updated : d));
+  };
 
   return (
-    <div>
-      <h2>Doctors</h2>
-      {doctors.length === 0 ? (
-        <p>No doctors available at the moment.</p>
-      ) : (
-        <ul>
-          {doctors.map((doctor) => (
-            <li key={doctor.id}>
-              <strong>Dr. {doctor.name}</strong> — {doctor.specialty}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="p-4 grid gap-4">
+      <h1 className="text-2xl font-bold mb-4">Doctors</h1>
+      {doctors.map(d => (
+        <DoctorsCard key={d.id} doctor={d} onDelete={handleDelete} onUpdate={handleUpdate} />
+      ))}
     </div>
-  )
+  );
 }
-
-export default Doctors

@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./pages/Home";
-import Patients from "./pages/Patients";
-import Appointments from "./pages/Appointments";
-import Doctors from "./pages/Doctors";
+import Home from "./pages/Home.jsx";
+import Patients from "./pages/Patients.jsx";
+import Appointments from "./pages/Appointments.jsx";
+import Doctors from "./pages/Doctors.jsx";
 import "./styles/app.css";
 
 function App() {

@@ -1,24 +1,30 @@
-import { useEffect, useState } from "react"
+// src/pages/Patients.jsx
+import { useEffect, useState } from "react";
+import PatientsForm from "../components/PatientsForm.jsx";
+import { fetchJSON } from "../api/client";
 
-function Patients() {
-  const [patients, setPatients] = useState([])
+export default function PatientsPage() {
+  const [patients, setPatients] = useState([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/patients/")
-      .then((r) => r.json())
-      .then(setPatients)
-  }, [])
+    fetchJSON("/patients")
+      .then(data => setPatients(data))
+      .catch(err => console.error("Failed to fetch patients", err));
+  }, []);
+
+  const handleNewPatient = (patient) => setPatients(prev => [...prev, patient]);
 
   return (
-    <div className="patients-page">
-      <h2>Patient List</h2>
-      <ul>
-        {patients.map((p) => (
-          <li key={p.id}>{p.name} ({p.age} yrs)</li>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Patients</h1>
+      <PatientsForm onCreated={handleNewPatient} />
+      <ul className="mt-4">
+        {patients.map(p => (
+          <li key={p.id} className="border p-2 rounded mb-2">
+            {p.name}, Age: {p.age}, Gender: {p.gender}, Phone: {p.phone}
+          </li>
         ))}
       </ul>
     </div>
-  )
+  );
 }
-
-export default Patients
