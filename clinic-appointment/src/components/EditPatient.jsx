@@ -18,7 +18,7 @@ export default function EditPatientForm() {
   useEffect(() => {
     const fetchPatient = async () => {
       try {
-        const res = await API.get(`/patients/${id}`);
+        const res = await API.get(`http://127.0.0.1:5555/patients/${id}`);
         // Handle both { patient: {...} } and {...} response shapes
         const data = res.data.patient || res.data;
 
@@ -45,11 +45,11 @@ export default function EditPatientForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.put(`/patients/${id}`, {
+      await API.put(`http://127.0.0.1:5555/patients/${id}`, {
         ...formData,
         age: Number(formData.age), // backend expects number
       });
-      navigate("/patients");
+      navigate("http://127.0.0.1:5555/patients");
     } catch (err) {
       console.error("Error updating patient:", err);
       // Optional: show error feedback to user

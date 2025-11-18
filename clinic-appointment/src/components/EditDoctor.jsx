@@ -9,7 +9,7 @@ export default function EditDoctorForm() {
 
   useEffect(() => {
     const fetchDoctor = async () => {
-      const res = await API.get(`/doctors/${id}`);
+      const res = await API.get(`http://127.0.0.1:5555/doctors/${id}`);
       setFormData(res.data);
     };
     fetchDoctor();
@@ -19,8 +19,8 @@ export default function EditDoctorForm() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await API.put(`/doctors/${id}`, formData);
-    navigate("/doctors");
+    await API.put(`http://127.0.0.1:5555/doctors/${id}`, formData);
+    navigate("http://127.0.0.1:5555/doctors");
   };
 
   return (

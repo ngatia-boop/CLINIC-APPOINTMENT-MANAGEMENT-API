@@ -10,8 +10,8 @@ export default function AddAppointmentForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const p = await API.get("/patients/");
-      const d = await API.get("/doctors/");
+      const p = await API.get("http://127.0.0.1:5555/patients/");
+      const d = await API.get("http://127.0.0.1:5555/doctors/");
       setPatients(p.data);
       setDoctors(d.data);
     };
@@ -22,8 +22,8 @@ export default function AddAppointmentForm() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await API.post("/appointments/", formData);
-    navigate("/appointments");
+    await API.post("http://127.0.0.1:5555/appointments/", formData);
+    navigate("http://127.0.0.1:5555/appointments");
   };
 
   return (

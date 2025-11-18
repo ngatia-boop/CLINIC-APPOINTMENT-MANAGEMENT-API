@@ -8,7 +8,7 @@ export default function AppointmentList() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-      const res = await API.get("/appointments/");
+      const res = await API.get("http://127.0.0.1:5555/appointments/");
       setAppointments(res.data);
     } catch (err){
       console.error("Failed to fetch appointments:", err);

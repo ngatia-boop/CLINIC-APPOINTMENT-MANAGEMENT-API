@@ -8,7 +8,7 @@ export default function DoctorList() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try{
-      const res = await API.get("/doctors/");
+      const res = await API.get("http://127.0.0.1:5555/doctors/");
       setDoctors(res.data);
     } catch (err){
       console.error("Failed to fetch doctors:", err);

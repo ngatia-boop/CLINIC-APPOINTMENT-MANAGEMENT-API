@@ -10,8 +10,8 @@ export default function AddPatientForm() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await API.post("/patients/", formData);
-    navigate("/patients");
+    await API.post("http://127.0.0.1:5555/patients/", formData);
+    navigate("http://127.0.0.1:5555/patients");
   };
 
   return (

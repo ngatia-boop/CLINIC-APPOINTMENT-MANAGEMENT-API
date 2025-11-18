@@ -11,11 +11,11 @@ export default function EditAppointmentForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await API.get(`/appointments/${id}`);
+      const res = await API.get(`http://127.0.0.1:5555/appointments/${id}`);
       setFormData(res.data);
 
-      const p = await API.get("/patients/");
-      const d = await API.get("/doctors/");
+      const p = await API.get("http://127.0.0.1:5555/patients/");
+      const d = await API.get("http://127.0.0.1:5555/doctors/");
       setPatients(p.data);
       setDoctors(d.data);
     };
@@ -26,8 +26,8 @@ export default function EditAppointmentForm() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await API.put(`/appointments/${id}`, formData);
-    navigate("/appointments");
+    await API.put(`http://127.0.0.1:5555/appointments/${id}`, formData);
+    navigate("http://127.0.0.1:5555/appointments");
   };
 
   return (
