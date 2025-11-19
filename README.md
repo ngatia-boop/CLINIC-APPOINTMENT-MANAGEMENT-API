@@ -27,11 +27,6 @@ clinic-appointment-management-api/
     └── ...
 ```
 
-## Live Deployments
-
-- **Frontend (Vercel)**: [https://clinic-appointment-management-api.vercel.app](https://clinic-appointment-management-api.vercel.app)
-- **Backend (Render)**: [https://clinic-appointment-management-api-3.onrender.com](https://clinic-appointment-management-api-3.onrender.com)
-
 ⚙️ Tech Stack
 Layer	Technology
 Frontend	React (Vite), React Router

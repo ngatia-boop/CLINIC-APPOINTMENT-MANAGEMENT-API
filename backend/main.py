@@ -4,7 +4,7 @@ from flask_cors import CORS
 app = create_app()
 
 # Enable CORS for your frontend
-CORS(app, origins=["https://clinic-appointment-management-api.vercel.app"])
+CORS(app, origins=["http://localhost:5173"])
 
 if __name__ == "__main__":
     # Run on port 5555 to match your old server
