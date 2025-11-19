@@ -27,6 +27,17 @@ clinic-appointment-management-api/
     └── ...
 ```
 
+## Backend API
+
+Deployed backend: [https://clinic-appointment-management-api-3.onrender.com](https://clinic-appointment-management-api-3.onrender.com)
+
+### Available Endpoints
+
+- `GET /patients`
+- `POST /appointments`
+- `GET /doctors`
+
+
 ⚙️ Tech Stack
 Layer	Technology
 Frontend	React (Vite), React Router
