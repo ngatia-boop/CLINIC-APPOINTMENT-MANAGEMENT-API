@@ -1,6 +1,9 @@
-const BASE = import.meta.env.VITE_API_BASE || "https://clinic-appointment-management-api-3.onrender.com";
+// src/api/client.jsx
+const BASE = import.meta.env.VITE_API_BASE;
 
 export async function fetchJSON(path, options = {}) {
+  if (!BASE) throw new Error("API base URL is not defined. Check your .env or Vercel environment variables.");
+
   const res = await fetch(`${BASE}${path}`, options);
   if (!res.ok) {
     const text = await res.text();
