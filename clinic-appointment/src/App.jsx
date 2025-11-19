@@ -13,12 +13,15 @@ import AppointmentList from "./components/AppointmentList";
 import AddAppointmentForm from "./components/AddAppointmentForm";
 import EditAppointmentForm from "./components/EditAppointmentForm";
 
+import "./styles/app.css";
+
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        
         {/* Patients */}
         <Route path="/patients" element={<PatientList />} />
         <Route path="/patients/add" element={<AddPatientForm />} />
