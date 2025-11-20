@@ -1,4 +1,4 @@
-from . import create_app
+from backend import create_app
 from flask_cors import CORS
 
 app = create_app()
