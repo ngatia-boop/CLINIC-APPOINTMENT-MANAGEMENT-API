@@ -26,6 +26,19 @@ clinic-appointment-management-api/
     ├── package.json
     └── ...
 ```
+## Deployment
+This project is deployed using:
+
+Backend (Flask API) → Render
+
+Frontend (React + Vite) → Vercel
+
+## Live Deployment 
+Frontend: https://clinic-appointment-management-api.vercel.app/
+
+Backend:  https://clinic-appointment-management-api.onrender.com
+
+
 
 ⚙️ Tech Stack
 Layer	Technology
