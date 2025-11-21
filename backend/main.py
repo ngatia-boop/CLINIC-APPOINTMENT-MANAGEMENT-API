@@ -2,10 +2,10 @@
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from backend.extensions import db
-from backend.models.patient import Patient
-from backend.models.doctor import Doctor
-from backend.models.appointment import Appointment
+from extensions import db
+from models.patient import Patient
+from models.doctor import Doctor
+from models.appointment import Appointment
 from datetime import datetime
 
 app = Flask(__name__)
