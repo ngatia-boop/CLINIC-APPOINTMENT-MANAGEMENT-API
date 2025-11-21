@@ -1,104 +1,95 @@
 # backend/main.py
-import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from extensions import db
-from models.patient import Patient
-from models.doctor import Doctor
-from models.appointment import Appointment
-from datetime import datetime
+from backend.extensions import db
+from backend.models import Patient, Doctor, Appointment
+from datetime import date, time
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinic.db'  
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def create_app():
+    app = Flask(__name__)
+    CORS(app, origins=["*"])  # Allow all origins for now
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinic.db'  # or your preferred DB
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
 
-# Initialize extensions
-db.init_app(app)
-CORS(app, resources={r"/*": {"origins": "*"}})  
+    with app.app_context():
+        # Create tables
+        db.create_all()
 
-# Ensure tables exist
-with app.app_context():
-    db.create_all()
+        # --- SEED DATA ---
+        if not Patient.query.first():  # Only seed if database is empty
+            print("🌱 Seeding database...")
 
+            doctors = [
+                Doctor(name="Dr. Sarah Kim", specialization="Cardiology", phone="0712345678"),
+                Doctor(name="Dr. John Mwangi", specialization="Dermatology", phone="0798765432"),
+                Doctor(name="Dr. Diana Kithinji", specialization="Psychologist", phone="0700987654"),
+            ]
+            db.session.add_all(doctors)
+            db.session.commit()  # Commit first to generate IDs
 
-# -----------------------------
-# HOME
-# -----------------------------
-@app.route("/", strict_slashes=False)
-def home():
-    return jsonify({"message": "Clinic API running!"})
+            patients = [
+                Patient(name="Alice Wanjiku", age=28, gender="Female", phone="0700001111"),
+                Patient(name="Brian Otieno", age=34, gender="Male", phone="0700002222"),
+                Patient(name="Charles Mwangi", age=45, gender="Male", phone="0700003333"),
+                Patient(name="Diana Njeri", age=32, gender="Female", phone="0700004444"),
+            ]
+            db.session.add_all(patients)
+            db.session.commit()  # Commit to generate IDs
 
+            appointments = [
+                Appointment(date=date(2025, 11, 20), time=time(10, 30),
+                            notes="Routine checkup", patient_id=patients[0].id, doctor_id=doctors[0].id),
+                Appointment(date=date(2025, 11, 21), time=time(14, 15),
+                            notes="Skin rash treatment", patient_id=patients[1].id, doctor_id=doctors[1].id),
+                Appointment(date=date(2025, 11, 22), time=time(9, 0),
+                            notes="Psychology consultation", patient_id=patients[3].id, doctor_id=doctors[2].id),
+                Appointment(date=date(2025, 11, 23), time=time(11, 45),
+                            notes="Follow-up heart check", patient_id=patients[2].id, doctor_id=doctors[0].id),
+                Appointment(date=date(2025, 11, 24), time=time(16, 0),
+                            notes="Dermatology follow-up", patient_id=patients[1].id, doctor_id=doctors[1].id),
+            ]
+            db.session.add_all(appointments)
+            db.session.commit()
+            print("✅ Database seeded successfully!")
 
-# -----------------------------
-# PATIENTS ENDPOINT
-# -----------------------------
-@app.route("/patients", methods=["GET", "POST"], strict_slashes=False)
-def patients_handler():
-    if request.method == "GET":
+    # ----------------- ROUTES ----------------- #
+    @app.route("/patients", methods=["GET"])
+    def get_patients():
         patients = Patient.query.all()
-        return jsonify([p.to_dict(include_appointments=True) for p in patients])
+        return jsonify([{
+            "id": p.id,
+            "name": p.name,
+            "age": p.age,
+            "gender": p.gender,
+            "phone": p.phone
+        } for p in patients])
 
-    data = request.get_json()
-    patient = Patient(
-        name=data["name"],
-        age=data["age"],
-        gender=data["gender"],
-        phone=data["phone"]
-    )
-    db.session.add(patient)
-    db.session.commit()
-    return jsonify(patient.to_dict()), 201
-
-
-# -----------------------------
-# DOCTORS ENDPOINT
-# -----------------------------
-@app.route("/doctors", methods=["GET", "POST"], strict_slashes=False)
-def doctors_handler():
-    if request.method == "GET":
+    @app.route("/doctors", methods=["GET"])
+    def get_doctors():
         doctors = Doctor.query.all()
-        return jsonify([d.to_dict(include_appointments=True) for d in doctors])
+        return jsonify([{
+            "id": d.id,
+            "name": d.name,
+            "specialization": d.specialization,
+            "phone": d.phone
+        } for d in doctors])
 
-    data = request.get_json()
-    doctor = Doctor(
-        name=data["name"],
-        specialization=data["specialization"],
-        phone=data["phone"]
-    )
-    db.session.add(doctor)
-    db.session.commit()
-    return jsonify(doctor.to_dict()), 201
-
-
-# -----------------------------
-# APPOINTMENTS ENDPOINT
-# -----------------------------
-@app.route("/appointments", methods=["GET", "POST"], strict_slashes=False)
-def appointments_handler():
-    if request.method == "GET":
+    @app.route("/appointments", methods=["GET"])
+    def get_appointments():
         appointments = Appointment.query.all()
-        return jsonify([a.to_dict(include_patient=True, include_doctor=True) for a in appointments])
+        return jsonify([{
+            "id": a.id,
+            "date": a.date.isoformat(),
+            "time": a.time.isoformat(),
+            "notes": a.notes,
+            "patient_id": a.patient_id,
+            "doctor_id": a.doctor_id
+        } for a in appointments])
 
-    data = request.get_json()
-    # Parse date and time strings
-    date_obj = datetime.strptime(data["date"], "%Y-%m-%d").date()
-    time_obj = datetime.strptime(data["time"], "%H:%M").time()
-
-    appointment = Appointment(
-        date=date_obj,
-        time=time_obj,
-        notes=data["notes"],
-        patient_id=data["patient_id"],
-        doctor_id=data.get("doctor_id")  # Optional
-    )
-    db.session.add(appointment)
-    db.session.commit()
-    return jsonify(appointment.to_dict(include_patient=True, include_doctor=True)), 201
+    return app
 
 
-# -----------------------------
-# RENDER DEPLOYMENT ENTRYPOINT
-# -----------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5555))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app = create_app()
+    app.run(host="0.0.0.0", port=5555, debug=True)
