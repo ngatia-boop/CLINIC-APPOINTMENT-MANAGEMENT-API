@@ -1,8 +1,8 @@
 # backend/main.py
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from backend.extensions import db
-from backend.models import Patient, Doctor, Appointment
+from extensions import db
+from models import Patient, Doctor, Appointment
 from datetime import date, time
 
 def create_app():
