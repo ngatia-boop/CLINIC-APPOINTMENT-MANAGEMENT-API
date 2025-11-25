@@ -1,8 +1,8 @@
 # backend/routes/patient_routes.py
 from flask import request, jsonify
-from backend.models import Patient
-from backend.extensions import db
-from backend.routes import patients_bp
+from ..models import Patient
+from ..extensions import db
+from . import patients_bp
 
 @patients_bp.get("/")
 def get_patients():

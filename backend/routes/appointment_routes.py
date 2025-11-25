@@ -1,8 +1,8 @@
 # backend/routes/appointment_routes.py
 from flask import request, jsonify
-from backend.models import Appointment
-from backend.extensions import db
-from backend.routes import appointments_bp
+from ..models import Appointment
+from ..extensions import db
+from . import appointments_bp
 from datetime import datetime
 
 # GET all appointments
