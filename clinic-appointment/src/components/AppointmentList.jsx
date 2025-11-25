@@ -1,49 +1,53 @@
-// clinic-appointment/src/components/AppointmentList.jsx
 import { useEffect, useState } from "react";
-import { fetchJSON } from "../api/client.jsx";
+import API from "../api";
 import { Link } from "react-router-dom";
 
 export default function AppointmentList() {
   const [appointments, setAppointments] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    const loadAppointments = async () => {
+    const fetchData = async () => {
       try {
-        const data = await fetchJSON("/appointments/");
-        setAppointments(data);
+        const appts = await API.get("appointments/");
+        const pats = await API.get("patients/");
+        const docs = await API.get("doctors/");
+
+        setAppointments(appts);
+        setPatients(pats);
+        setDoctors(docs);
       } catch (err) {
         console.error("Failed to fetch appointments:", err);
       }
     };
-    loadAppointments();
+    fetchData();
   }, []);
 
   const deleteAppointment = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this appointment?")) return;
-
-    try {
-      await fetchJSON(`/appointments/${id}`, { method: "DELETE" });
-      setAppointments((prev) => prev.filter((a) => a.id !== id));
-    } catch (err) {
-      console.error("Failed to delete appointment:", err);
+    if (window.confirm("Are you sure you want to delete this appointment?")) {
+      try {
+        await API.delete(`appointments/${id}/`);
+        setAppointments(appointments.filter((a) => a.id !== id));
+      } catch (err) {
+        console.error("Failed to delete appointment:", err);
+      }
     }
   };
 
-  return (
-    <div className="container">
-      <h2>Appointments</h2>
-      <Link to="/appointments/add">
-        <button>Add Appointment</button>
-      </Link>
+  const getPatientName = (id) => patients.find((p) => p.id === id)?.name || "Unknown";
+  const getDoctorName = (id) => doctors.find((d) => d.id === id)?.name || "Unknown";
 
+  return (
+    <div>
+      <h2>Appointments</h2>
+      <Link to="/appointments/add"><button>Add Appointment</button></Link>
       <ul>
         {appointments.map((a) => (
           <li key={a.id}>
-            {a.patient?.name} → {a.doctor?.name || "No doctor"} | {a.date} {a.time}{" "}
-            <Link to={`/appointments/edit/${a.id}`}>
-              <button>Edit</button>
-            </Link>{" "}
-            <button onClick={() => deleteAppointment(a.id)}>🗑 Delete</button>
+            {getPatientName(a.patient_id)} → {getDoctorName(a.doctor_id)} | {a.date} {a.time}
+            <Link to={`/appointments/edit/${a.id}`}><button>Edit</button></Link>
+            <button onClick={() => deleteAppointment(a.id)}>Delete</button>
           </li>
         ))}
       </ul>

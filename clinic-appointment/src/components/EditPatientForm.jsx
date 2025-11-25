@@ -1,6 +1,5 @@
-// clinic-appointment/src/components/EditPatientForm.jsx
 import { useState, useEffect } from "react";
-import { fetchJSON } from "../api/client.jsx";
+import API from "../api";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditPatientForm() {
@@ -17,14 +16,12 @@ export default function EditPatientForm() {
   useEffect(() => {
     const fetchPatient = async () => {
       try {
-        const data = await fetchJSON(`/patients/${id}`);
-        const patient = data.patient || data;
-
+        const data = await API.get(`patients/${id}/`);
         setFormData({
-          name: patient.name || "",
-          age: patient.age != null ? String(patient.age) : "",
-          gender: patient.gender || "",
-          phone: patient.phone || "",
+          name: data.name || "",
+          age: data.age != null ? String(data.age) : "",
+          gender: data.gender || "",
+          phone: data.phone || "",
         });
       } catch (err) {
         console.error("Error fetching patient:", err);
@@ -33,18 +30,12 @@ export default function EditPatientForm() {
     fetchPatient();
   }, [id]);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await fetchJSON(`/patients/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, age: Number(formData.age) }),
-      });
+      await API.put(`patients/${id}/`, { ...formData, age: Number(formData.age) });
       navigate("/patients");
     } catch (err) {
       console.error("Error updating patient:", err);
@@ -52,28 +43,17 @@ export default function EditPatientForm() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "auto" }}>
-      <h2>Edit Patient</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Name:</label>
-        <input name="name" value={formData.name} onChange={handleChange} required />
-
-        <label>Age:</label>
-        <input name="age" type="number" value={formData.age} onChange={handleChange} required />
-
-        <label>Gender:</label>
-        <select name="gender" value={formData.gender} onChange={handleChange} required>
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
-        </select>
-
-        <label>Phone:</label>
-        <input name="phone" type="tel" value={formData.phone} onChange={handleChange} required />
-
-        <button type="submit" style={{ marginTop: "10px" }}>Save</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
+      <input name="age" type="number" placeholder="Age" value={formData.age} onChange={handleChange} required />
+      <select name="gender" value={formData.gender} onChange={handleChange} required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} required />
+      <button type="submit">Save</button>
+    </form>
   );
 }

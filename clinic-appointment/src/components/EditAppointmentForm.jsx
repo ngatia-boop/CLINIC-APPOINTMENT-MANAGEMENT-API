@@ -1,6 +1,5 @@
-// clinic-appointment/src/components/EditAppointmentForm.jsx
 import { useState, useEffect } from "react";
-import { fetchJSON } from "../api/client.jsx";
+import API from "../api";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditAppointmentForm() {
@@ -8,49 +7,39 @@ export default function EditAppointmentForm() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    patient_id: "",
+    doctor_id: "",
     date: "",
     time: "",
     notes: "",
-    patient_id: "",
-    doctor_id: "",
   });
 
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    const loadData = async () => {
+    const fetchData = async () => {
       try {
-        // Load appointment
-        const appointment = await fetchJSON(`/appointments/${id}`);
-        setFormData(appointment);
+        const appt = await API.get(`appointments/${id}/`);
+        setFormData(appt);
 
-        // Load patients + doctors
-        const p = await fetchJSON("/patients/");
-        const d = await fetchJSON("/doctors/");
-
+        const p = await API.get("patients/");
+        const d = await API.get("doctors/");
         setPatients(p);
         setDoctors(d);
       } catch (err) {
-        console.error("Error loading appointment:", err);
+        console.error("Error fetching appointment data:", err);
       }
     };
-    loadData();
+    fetchData();
   }, [id]);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await fetchJSON(`/appointments/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
+      await API.put(`appointments/${id}/`, formData);
       navigate("/appointments");
     } catch (err) {
       console.error("Error updating appointment:", err);
@@ -58,29 +47,26 @@ export default function EditAppointmentForm() {
   };
 
   return (
-    <div className="container">
-      <h2>Edit Appointment</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="date" name="date" value={formData.date} onChange={handleChange} required />
-        <input type="time" name="time" value={formData.time} onChange={handleChange} required />
-        <input type="text" name="notes" value={formData.notes} onChange={handleChange} placeholder="Notes" required />
+    <form onSubmit={handleSubmit}>
+      <select name="patient_id" value={formData.patient_id} onChange={handleChange} required>
+        <option value="">Select Patient</option>
+        {patients.map((p) => (
+          <option key={p.id} value={p.id}>{p.name}</option>
+        ))}
+      </select>
 
-        <select name="patient_id" value={formData.patient_id} onChange={handleChange} required>
-          <option value="">Select Patient</option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
+      <select name="doctor_id" value={formData.doctor_id} onChange={handleChange}>
+        <option value="">Select Doctor</option>
+        {doctors.map((d) => (
+          <option key={d.id} value={d.id}>{d.name}</option>
+        ))}
+      </select>
 
-        <select name="doctor_id" value={formData.doctor_id} onChange={handleChange}>
-          <option value="">Select Doctor</option>
-          {doctors.map((d) => (
-            <option key={d.id} value={d.id}>{d.name}</option>
-          ))}
-        </select>
+      <input type="date" name="date" value={formData.date} onChange={handleChange} required />
+      <input type="time" name="time" value={formData.time} onChange={handleChange} required />
+      <input type="text" name="notes" placeholder="Notes" value={formData.notes} onChange={handleChange} />
 
-        <button type="submit">Save</button>
-      </form>
-    </div>
+      <button type="submit">Save</button>
+    </form>
   );
 }
