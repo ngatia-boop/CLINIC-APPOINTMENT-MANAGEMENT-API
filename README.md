@@ -34,9 +34,9 @@ Backend (Flask API) → Render
 Frontend (React + Vite) → Vercel
 
 ## Live Deployment 
-Frontend: https://clinic-appointment-management-api.vercel.app/
+Frontend: 
 
-Backend:  https://clinic-appointment-management-api.onrender.com
+Backend:  
 
 
 
