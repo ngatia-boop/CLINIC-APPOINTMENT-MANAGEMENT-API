@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_BASE || "https://clinic-appointment-management-api.onrender.com";
+const BASE = import.meta.env.VITE_API_BASE;
 
 export async function fetchJSON(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, options);
