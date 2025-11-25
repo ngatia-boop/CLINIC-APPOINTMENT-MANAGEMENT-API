@@ -2,8 +2,8 @@
 import os
 from flask import Flask, jsonify
 from flask_cors import CORS
-from .extensions import db
-from .routes import appointments_bp, doctors_bp, patients_bp
+from extensions import db
+from routes import appointments_bp, doctors_bp, patients_bp
 
 def create_app():
     app = Flask(__name__)
