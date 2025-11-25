@@ -8,25 +8,22 @@ export default function AppointmentList() {
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const apptsRes = await API.get("appointments/");
-        const patsRes = await API.get("patients/");
-        const docsRes = await API.get("doctors/");
+  const fetchData = async () => {
+    try {
+      const appts = await API.get("appointments/");
+      const pats = await API.get("patients/");
+      const docs = await API.get("doctors/");
 
-        console.log("APPTS:", apptsRes.data);
-        console.log("PATS:", patsRes.data);
-        console.log("DOCS:", docsRes.data);
+      setAppointments(appts.data);
+      setPatients(pats.data);
+      setDoctors(docs.data);
+    } catch (err) {
+      console.error("Failed to fetch appointments:", err);
+    }
+  };
+  fetchData();
+}, []);
 
-        setAppointments(apptsRes.data);
-        setPatients(patsRes.data);
-        setDoctors(docsRes.data);
-      } catch (err) {
-        console.error("Failed to fetch appointments:", err);
-      }
-    };
-    fetchData();
-  }, []);
 
   const deleteAppointment = async (id) => {
     if (window.confirm("Are you sure you want to delete this appointment?")) {
