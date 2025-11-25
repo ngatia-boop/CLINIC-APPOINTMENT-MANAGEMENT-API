@@ -1,17 +1,33 @@
+// clinic-appointment/src/components/AddDoctorForm.jsx
 import { useState } from "react";
-import API from "../api";
+import { fetchJSON } from "../api/client.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function AddDoctorForm() {
-  const [formData, setFormData] = useState({ name: "", specialization: "", phone: "" });
   const navigate = useNavigate();
 
-  const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const [formData, setFormData] = useState({
+    name: "",
+    specialty: "",
+    phone: "",
+  });
 
-  const handleSubmit = async e => {
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    await API.post("/doctors/", formData);
-    navigate("/doctors");
+
+    try {
+      await fetchJSON("/doctors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      navigate("/doctors");
+    } catch (err) {
+      console.error("Error adding doctor:", err);
+    }
   };
 
   return (
@@ -19,9 +35,12 @@ export default function AddDoctorForm() {
       <h2>Add Doctor</h2>
       <form onSubmit={handleSubmit}>
         <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-        <input name="specialization" value={formData.specialty} onChange={handleChange} placeholder="Specialty" required />
+
+        <input name="specialty" value={formData.specialty} onChange={handleChange} placeholder="Specialty" required />
+
         <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" required />
-        <button type="submit">Save</button>
+
+        <button type="submit">Add Doctor</button>
       </form>
     </div>
   );

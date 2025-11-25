@@ -1,12 +1,12 @@
+// clinic-appointment/src/components/EditPatientForm.jsx
 import { useState, useEffect } from "react";
-import API from "../api";
+import { fetchJSON } from "../api/client.jsx";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditPatientForm() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Initialize all fields as empty strings
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -14,45 +14,40 @@ export default function EditPatientForm() {
     phone: "",
   });
 
-  // Fetch patient details once
   useEffect(() => {
     const fetchPatient = async () => {
       try {
-        const res = await API.get(`/patients/${id}`);
-        // Handle both { patient: {...} } and {...} response shapes
-        const data = res.data.patient || res.data;
+        const data = await fetchJSON(`/patients/${id}`);
+        const patient = data.patient || data;
 
         setFormData({
-          name: data.name || "",
-          age: data.age != null ? String(data.age) : "", // safe string conversion
-          gender: data.gender || "",
-          phone: data.phone || "",
+          name: patient.name || "",
+          age: patient.age != null ? String(patient.age) : "",
+          gender: patient.gender || "",
+          phone: patient.phone || "",
         });
       } catch (err) {
         console.error("Error fetching patient:", err);
-        // Optional: show an error message or redirect
       }
     };
     fetchPatient();
-  }, [id, navigate]); // include navigate if ESLint warns
+  }, [id]);
 
-  // Handle input changes
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  // Submit updated data
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await API.put(`/patients/${id}`, {
-        ...formData,
-        age: Number(formData.age), // backend expects number
+      await fetchJSON(`/patients/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, age: Number(formData.age) }),
       });
       navigate("/patients");
     } catch (err) {
       console.error("Error updating patient:", err);
-      // Optional: show error feedback to user
     }
   };
 
@@ -61,31 +56,13 @@ export default function EditPatientForm() {
       <h2>Edit Patient</h2>
       <form onSubmit={handleSubmit}>
         <label>Name:</label>
-        <input
-          name="name"
-          type="text"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
+        <input name="name" value={formData.name} onChange={handleChange} required />
 
         <label>Age:</label>
-        <input
-          name="age"
-          type="number"
-          value={formData.age}
-          onChange={handleChange}
-          required
-        />
+        <input name="age" type="number" value={formData.age} onChange={handleChange} required />
 
         <label>Gender:</label>
-        {/* Consider using a select for consistency */}
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          required
-        >
+        <select name="gender" value={formData.gender} onChange={handleChange} required>
           <option value="">Select gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -93,17 +70,9 @@ export default function EditPatientForm() {
         </select>
 
         <label>Phone:</label>
-        <input
-          name="phone"
-          type="tel"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
+        <input name="phone" type="tel" value={formData.phone} onChange={handleChange} required />
 
-        <button type="submit" style={{ marginTop: "10px" }}>
-          Save
-        </button>
+        <button type="submit" style={{ marginTop: "10px" }}>Save</button>
       </form>
     </div>
   );

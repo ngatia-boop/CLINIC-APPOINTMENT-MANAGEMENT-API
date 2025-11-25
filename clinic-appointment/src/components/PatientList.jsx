@@ -1,30 +1,30 @@
 import { useEffect, useState } from "react";
-import API from "../api";
+import { fetchJSON } from "../api/client.jsx";
 import { Link } from "react-router-dom";
 
 export default function PatientList() {
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
-    const fetchPatients = async () => {
+    const loadPatients = async () => {
       try {
-        const res = await API.get("/patients/");
-        setPatients(res.data);
+        const data = await fetchJSON("/patients/");
+        setPatients(data);
       } catch (err) {
         console.error("Failed to fetch patients:", err);
       }
     };
-    fetchPatients();
+    loadPatients();
   }, []);
 
   const deletePatient = async (id) => {
-    if (window.confirm("Are you sure you want to delete this patient?")) {
-      try {
-        await API.delete(`/patients/${id}`);
-        setPatients(patients.filter((p) => p.id !== id));
-      } catch (err) {
-        console.error("Failed to delete patient:", err);
-      }
+    if (!window.confirm("Are you sure you want to delete this patient?")) return;
+
+    try {
+      await fetchJSON(`/patients/${id}`, { method: "DELETE" });
+      setPatients((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Failed to delete patient:", err);
     }
   };
 
@@ -37,10 +37,10 @@ export default function PatientList() {
       <ul>
         {patients.map((p) => (
           <li key={p.id}>
-            {p.name} | {p.age} years | {p.gender}{" "}
+            {p.name} | {p.age} years | {p.gender}
             <Link to={`/patients/edit/${p.id}`}>
               <button>Edit</button>
-            </Link>{" "}
+            </Link>
             <button onClick={() => deletePatient(p.id)}>🗑 Delete</button>
           </li>
         ))}

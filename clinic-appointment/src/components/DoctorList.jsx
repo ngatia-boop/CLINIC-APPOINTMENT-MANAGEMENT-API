@@ -1,30 +1,31 @@
+// clinic-appointment/src/components/DoctorList.jsx
 import { useEffect, useState } from "react";
-import API from "../api";
+import { fetchJSON } from "../api/client.jsx";
 import { Link } from "react-router-dom";
 
 export default function DoctorList() {
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    const loadDoctors = async () => {
       try {
-        const res = await API.get("/doctors/");
-        setDoctors(res.data);
+        const data = await fetchJSON("/doctors/");
+        setDoctors(data);
       } catch (err) {
         console.error("Failed to fetch doctors:", err);
       }
     };
-    fetchDoctors();
+    loadDoctors();
   }, []);
 
   const deleteDoctor = async (id) => {
-    if (window.confirm("Are you sure you want to delete this doctor?")) {
-      try {
-        await API.delete(`/doctors/${id}`);
-        setDoctors(doctors.filter((d) => d.id !== id));
-      } catch (err) {
-        console.error("Failed to delete doctor:", err);
-      }
+    if (!window.confirm("Are you sure you want to delete this doctor?")) return;
+
+    try {
+      await fetchJSON(`/doctors/${id}`, { method: "DELETE" });
+      setDoctors((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error("Failed to delete doctor:", err);
     }
   };
 
@@ -34,6 +35,7 @@ export default function DoctorList() {
       <Link to="/doctors/add">
         <button>Add Doctor</button>
       </Link>
+
       <ul>
         {doctors.map((d) => (
           <li key={d.id}>
