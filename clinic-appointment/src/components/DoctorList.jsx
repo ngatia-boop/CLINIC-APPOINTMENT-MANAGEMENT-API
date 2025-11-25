@@ -5,17 +5,20 @@ import { Link } from "react-router-dom";
 export default function DoctorList() {
   const [doctors, setDoctors] = useState([]);
 
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const data = await API.get("doctors/");
-        setDoctors(data);
-      } catch (err) {
-        console.error("Failed to fetch doctors:", err);
-      }
-    };
-    fetchDoctors();
-  }, []);
+ useEffect(() => {
+  const fetchDoctors = async () => {
+    try {
+      const res = await API.get("doctors/");
+      console.log("Doctors RAW:", res);
+      console.log("Doctors DATA:", res.data);
+      setDoctors(res.data);
+    } catch (err) {
+      console.error("Failed to fetch doctors:", err);
+    }
+  };
+  fetchDoctors();
+}, []);
+
 
   const deleteDoctor = async (id) => {
     if (window.confirm("Are you sure you want to delete this doctor?")) {

@@ -6,16 +6,21 @@ export default function PatientList() {
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const data = await API.get("patients/");
-        setPatients(data);
-      } catch (err) {
-        console.error("Failed to fetch patients:", err);
-      }
-    };
-    fetchPatients();
-  }, []);
+  const fetchPatients = async () => {
+    try {
+      const res = await API.get("patients/");
+
+      console.log("RAW RESPONSE:", res);
+      console.log("RESPONSE DATA:", res.data);
+
+      setPatients(res.data);
+    } catch (err) {
+      console.error("Failed to fetch patients:", err);
+    }
+  };
+  fetchPatients();
+}, []);
+
 
   const deletePatient = async (id) => {
     if (window.confirm("Are you sure you want to delete this patient?")) {

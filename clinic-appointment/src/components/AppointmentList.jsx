@@ -10,13 +10,17 @@ export default function AppointmentList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const appts = await API.get("appointments/");
-        const pats = await API.get("patients/");
-        const docs = await API.get("doctors/");
+        const apptsRes = await API.get("appointments/");
+        const patsRes = await API.get("patients/");
+        const docsRes = await API.get("doctors/");
 
-        setAppointments(appts);
-        setPatients(pats);
-        setDoctors(docs);
+        console.log("APPTS:", apptsRes.data);
+        console.log("PATS:", patsRes.data);
+        console.log("DOCS:", docsRes.data);
+
+        setAppointments(apptsRes.data);
+        setPatients(patsRes.data);
+        setDoctors(docsRes.data);
       } catch (err) {
         console.error("Failed to fetch appointments:", err);
       }
@@ -45,7 +49,8 @@ export default function AppointmentList() {
       <ul>
         {appointments.map((a) => (
           <li key={a.id}>
-            {getPatientName(a.patient_id)} → {getDoctorName(a.doctor_id)} | {a.date} {a.time}
+            {getPatientName(a.patient_id)} → {getDoctorName(a.doctor_id)} |
+            {a.date} {a.time}
             <Link to={`/appointments/edit/${a.id}`}><button>Edit</button></Link>
             <button onClick={() => deleteAppointment(a.id)}>Delete</button>
           </li>
@@ -54,3 +59,4 @@ export default function AppointmentList() {
     </div>
   );
 }
+
